@@ -1,5 +1,5 @@
 ﻿//
-//  Test.cs
+//  CdIndex.cs
 //
 //  Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -18,18 +18,17 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using NUnit.Framework;
 using System;
 
-namespace Bokuract.Tests
+namespace Bokuract
 {
-	[TestFixture()]
-	public class Test
+	public class CdIndex
 	{
-		[Test()]
-		public void TestCase()
+		public CdIndex()
 		{
 		}
+
+
 	}
 }
 

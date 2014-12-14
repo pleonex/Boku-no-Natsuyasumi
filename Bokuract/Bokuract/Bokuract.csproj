@@ -41,6 +41,9 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CdIndex.cs" />
+    <Compile Include="CdIndexEntry.cs" />
+    <Compile Include="CdIndexParser.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
