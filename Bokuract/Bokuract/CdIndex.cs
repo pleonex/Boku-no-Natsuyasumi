@@ -104,7 +104,7 @@ namespace Bokuract
 			GameFolder currFolder = new GameFolder(entry.Name, folder);
 
 			// Add files and folders
-			for (int i = 0; i < entry.SubEntries; i++)
+			for (int i = 0; i < entry.SubEntries - 1; i++)
 				GiveFormat(entries, currFolder);
 		}
 
