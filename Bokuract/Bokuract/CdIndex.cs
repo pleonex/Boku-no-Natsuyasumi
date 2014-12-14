@@ -32,14 +32,15 @@ namespace Bokuract
 		public static int Padding { get { return 0x800; } }
 		public override string FormatName { get { return "Boku1.DIF"; } }
 
-		public string Type     { get { return "DIF\0"; } }
+		public string Type     { get { return "DFI"; } }
 		public uint   Unknown  { get; set; }
 		public GameFolder Root { get; private set; }
 		private GameFile FileData { get; set; }
 
 		public override void Initialize(GameFile file, params object[] parameters)
 		{
-			this.FileData = file.Dependencies["cdImg.img"];
+			base.Initialize(file, parameters);
+			this.FileData = file.Dependencies["cdimg0.img"];
 		}
 
 		public override void Read(DataStream strIn)
@@ -59,7 +60,7 @@ namespace Bokuract
 
 			// Read entries
 			Queue<CdIndexEntry> entries = new Queue<CdIndexEntry>();
-			for (int i = 0; i < numEntries; i++)
+			for (int i = 0; i < numEntries - 1; i++)
 				entries.Enqueue(ReadEntry(reader));
 
 			// Generate file system
@@ -91,28 +92,20 @@ namespace Bokuract
 		private void GiveFormat(Queue<CdIndexEntry> entries, GameFolder folder)
 		{
 			CdIndexEntry entry = entries.Dequeue();
-			if (!entry.IsFolder)
-				throw new FormatException("Unexpected file");
-
-			// Create the folder
-			GameFolder currFolder = new GameFolder(entry.Name);
-
-			// Add files
-			bool moreFiles = !entries.Peek().IsFolder;
-			while (moreFiles) {
-				CdIndexEntry fileEntry = entries.Dequeue();
-				moreFiles = !fileEntry.IsLastFile;
-				currFolder.AddFile(new GameFile(
-					fileEntry.Name,
-					new DataStream(this.FileData.Stream, fileEntry.Offset, fileEntry.Size)
+			if (!entry.IsFolder) {
+				folder.AddFile(new GameFile(
+					entry.Name,
+					new DataStream(this.FileData.Stream, entry.Offset, entry.Size)
 				));
+				return;
 			}
 
-			// Add folders
-			while (currFolder.Files.Count + currFolder.Folders.Count < entry.SubEntries)
-				GiveFormat(entries, currFolder);
+			// Create the folder
+			GameFolder currFolder = new GameFolder(entry.Name, folder);
 
-			folder.AddFolder(currFolder);
+			// Add files and folders
+			for (int i = 0; i < entry.SubEntries; i++)
+				GiveFormat(entries, currFolder);
 		}
 
 		public override void Write(DataStream strOut)
