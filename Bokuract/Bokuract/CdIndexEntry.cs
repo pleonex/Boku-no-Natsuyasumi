@@ -24,30 +24,14 @@ namespace Bokuract
 {
 	public struct CdIndexEntry
 	{
-		private const int Padding = 0x800;
+		public static int EntrySize { get { return 0x10; } }
 
-		public CdIndexEntry(int type, int flag, string name, long offset, long size)
-			: this()
-		{
-			this.IsFolder = (type == 1);
-			this.Name    = name;
-			this.Offset  = offset * Padding;
-			this.Size    = size;
-
-			if (this.IsFolder)
-				this.SubEntries = flag;
-			else {
-				this.IsLastFile = (flag == 0);
-				this.SubEntries = -1;
-			}
-		}
-
-		public bool   IsFolder   { get; private set; }
-		public bool   IsLastFile { get; private set; }
-		public int    SubEntries { get; private set; }
-		public string Name       { get; private set; }
-		public long   Offset     { get; private set; }
-		public long   Size       { get; private set; }
+		public bool   IsFolder   { get; set; }
+		public bool   IsLastFile { get; set; }
+		public int    SubEntries { get; set; }
+		public string Name       { get; set; }
+		public long   Offset     { get; set; }
+		public long   Size       { get; set; }
 	}
 }
 
