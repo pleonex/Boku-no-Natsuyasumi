@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bokuract", "Bokuract\Bokuract.csproj", "{965556AA-1389-4919-98F4-C7EA46ADFA75}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bokuract.Tests", "Bokuract.Tests\Bokuract.Tests.csproj", "{ADDE8433-9E05-4C15-94C8-F07F966C1ADB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -15,10 +13,6 @@ Global
 		{965556AA-1389-4919-98F4-C7EA46ADFA75}.Debug|x86.Build.0 = Debug|x86
 		{965556AA-1389-4919-98F4-C7EA46ADFA75}.Release|x86.ActiveCfg = Release|x86
 		{965556AA-1389-4919-98F4-C7EA46ADFA75}.Release|x86.Build.0 = Release|x86
-		{ADDE8433-9E05-4C15-94C8-F07F966C1ADB}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{ADDE8433-9E05-4C15-94C8-F07F966C1ADB}.Debug|x86.Build.0 = Debug|Any CPU
-		{ADDE8433-9E05-4C15-94C8-F07F966C1ADB}.Release|x86.ActiveCfg = Release|Any CPU
-		{ADDE8433-9E05-4C15-94C8-F07F966C1ADB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Bokuract\Bokuract.csproj
