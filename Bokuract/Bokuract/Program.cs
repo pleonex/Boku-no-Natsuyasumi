@@ -31,16 +31,18 @@ namespace Bokuract
 	{
 		public static void Main(string[] args)
 		{
-			DataStream dataStream = new DataStream("cdimg0.img", FileMode.Open, FileAccess.Read);
-			GameFile data = new GameFile("cdimg0.img", dataStream);
-
 			DataStream indexStream = new DataStream("cdimg.idx", FileMode.Open, FileAccess.Read);
 			GameFile index = new GameFile("cdimg.idx", indexStream);
-			index.AddDependency(data);
 			index.SetFormat(typeof(CdIndex));
 			index.Format.Read();
 
-			ExtractFolder(".", (GameFolder)index.Folders.First());
+			DataStream dataStream = new DataStream("cdimg0.img", FileMode.Open, FileAccess.Read);
+			GameFile data = new GameFile("cdimg0.img", dataStream);
+			data.AddDependency(index);
+			data.SetFormat(typeof(CdData));
+			data.Format.Read();
+
+			ExtractFolder(".", (GameFolder)data.Folders.First());
 		}
 
 		private static void ExtractFolder(string outputDir, GameFolder folder)

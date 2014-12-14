@@ -19,8 +19,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using Libgame;
 using Mono.Addins;
+using Libgame;
 using Libgame.IO;
 using System.Collections.Generic;
 
@@ -34,14 +34,7 @@ namespace Bokuract
 
 		public string Type     { get { return "DFI"; } }
 		public uint   Unknown  { get; set; }
-		public GameFolder Root { get; private set; }
-		private GameFile FileData { get; set; }
-
-		public override void Initialize(GameFile file, params object[] parameters)
-		{
-			base.Initialize(file, parameters);
-			this.FileData = file.Dependencies["cdimg0.img"];
-		}
+		public CdIndexEntry[] Entries { get; set; }
 
 		public override void Read(DataStream strIn)
 		{
@@ -59,15 +52,9 @@ namespace Bokuract
 			strIn.Seek(8, SeekMode.Current);
 
 			// Read entries
-			Queue<CdIndexEntry> entries = new Queue<CdIndexEntry>();
-			for (int i = 0; i < numEntries - 1; i++)
-				entries.Enqueue(ReadEntry(reader));
-
-			// Generate file system
-			GameFolder root = new GameFolder("cdimg");
-			while (entries.Count > 0)
-				GiveFormat(entries, root);
-			this.File.AddFolder(root);
+			this.Entries = new CdIndexEntry[numEntries - 1];
+			for (int i = 0; i < this.Entries.Length; i++)
+				this.Entries[i] = ReadEntry(reader);
 		}
 
 		private CdIndexEntry ReadEntry(DataReader reader)
@@ -87,25 +74,6 @@ namespace Bokuract
 			reader.Stream.Seek(entryOffset + CdIndexEntry.EntrySize, SeekMode.Origin);
 
 			return entry;
-		}
-
-		private void GiveFormat(Queue<CdIndexEntry> entries, GameFolder folder)
-		{
-			CdIndexEntry entry = entries.Dequeue();
-			if (!entry.IsFolder) {
-				folder.AddFile(new GameFile(
-					entry.Name,
-					new DataStream(this.FileData.Stream, entry.Offset, entry.Size)
-				));
-				return;
-			}
-
-			// Create the folder
-			GameFolder currFolder = new GameFolder(entry.Name, folder);
-
-			// Add files and folders
-			for (int i = 0; i < entry.SubEntries - 1; i++)
-				GiveFormat(entries, currFolder);
 		}
 
 		public override void Write(DataStream strOut)
@@ -128,4 +96,3 @@ namespace Bokuract
 		}
 	}
 }
-
