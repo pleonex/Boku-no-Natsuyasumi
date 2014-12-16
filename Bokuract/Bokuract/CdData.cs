@@ -38,15 +38,12 @@ namespace Bokuract
 			CdIndex index = (CdIndex)File.Dependencies["cdimg.idx"].Format;
 
 			// Generate file system
-			GameFolder root = new GameFolder("cdimg");
-			this.File.AddFolder(root);
-
 			Queue<CdIndexEntry> entries = new Queue<CdIndexEntry>(index.Entries);
 			while (entries.Count > 0)
-				GiveFormat(entries, root);
+				GiveFormat(entries, this.File);
 		}
 
-		private void GiveFormat(Queue<CdIndexEntry> entries, GameFolder folder)
+		private void GiveFormat(Queue<CdIndexEntry> entries, FileContainer folder)
 		{
 			CdIndexEntry entry = entries.Dequeue();
 			if (!entry.IsFolder) {
