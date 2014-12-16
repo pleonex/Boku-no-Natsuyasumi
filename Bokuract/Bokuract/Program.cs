@@ -24,6 +24,7 @@ using Libgame.IO;
 using System.IO;
 using System.Linq;
 using Mono.Addins;
+using System.Collections.Generic;
 
 namespace Bokuract
 {
@@ -31,19 +32,23 @@ namespace Bokuract
 	{
 		public static void Main(string[] args)
 		{
-			GameFolder root = new GameFolder("boku1");
-			root.Tags["_Device_"] = "PSP";
+			// First args is the path input & output
+			if (args.Length != 1)
+				return;
 
-			DataStream indexStream = new DataStream("cdimg.idx", FileMode.Open, FileAccess.Read);
-			root.AddFile(new GameFile("cdimg.idx", indexStream));
+			// Create system folder
+			GameFolder root = GameFolderFactory.FromPath(args[0], "boku1");
+			root.AssignTagsRecursive(new Dictionary<string, object>() { {"_Device_", "PSP"} });
 
-			DataStream dataStream = new DataStream("cdimg0.img", FileMode.Open, FileAccess.Read);
-			root.AddFile(new GameFile("cdimg0.img", dataStream));
-
+			// Initialize file manager
 			FileManager.Initialize(root, new FileInfoCollection());
+
+			// Gets file and read it
 			GameFile file = FileManager.GetInstance().RescueFile("/boku1/cdimg0.img");
 			file.Format.Read();
-			ExtractFolder(".", (GameFolder)file.Folders.First());
+
+			// Extract files
+			ExtractFolder(args[0], (GameFolder)file.Folders.First());
 		}
 
 		private static void ExtractFolder(string outputDir, GameFolder folder)
