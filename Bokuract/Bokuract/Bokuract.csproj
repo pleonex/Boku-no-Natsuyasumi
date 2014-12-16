@@ -34,6 +34,9 @@
     <Reference Include="Mono.Addins">
       <HintPath>..\libgame\bin\Debug\Mono.Addins.dll</HintPath>
     </Reference>
+    <Reference Include="Ionic.Zlib">
+      <HintPath>..\Ionic.Zlib.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -43,6 +46,8 @@
     <Compile Include="CdIndex.cs" />
     <Compile Include="CdIndexValidation.cs" />
     <Compile Include="CdDataValidation.cs" />
+    <Compile Include="GZip.cs" />
+    <Compile Include="GZipValidation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
