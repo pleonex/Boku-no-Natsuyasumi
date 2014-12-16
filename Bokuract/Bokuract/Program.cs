@@ -33,31 +33,58 @@ namespace Bokuract
 		public static void Main(string[] args)
 		{
 			// First args is the path input & output
-			if (args.Length != 1)
+			if (args.Length == 0)
 				return;
 
 			// Create system folder
-			GameFolder root = GameFolderFactory.FromPath(args[0], "boku1");
+			GameFolder root = GameFolderFactory.FromPath(args[0], "root");
 			root.AssignTagsRecursive(new Dictionary<string, object>() { {"_Device_", "PSP"} });
 
 			// Initialize file manager
 			FileManager.Initialize(root, new FileInfoCollection());
+			FileManager manager = FileManager.GetInstance();
 
 			// Gets file and read it
-			GameFile file = FileManager.GetInstance().RescueFile("/boku1/cdimg0.img");
+			GameFile file = manager.RescueFile("/root/cdimg0.img");
 			file.Format.Read();
 
 			// Extract files
-			ExtractFolder(args[0], (GameFolder)file.Folders.First());
+			ReadAll(root);
+			ExtractFolder(args[0], root);
 		}
 
-		private static void ExtractFolder(string outputDir, GameFolder folder)
+		private static void ReadAll(FileContainer container)
+		{
+			foreach (GameFile subfile in container.Files) {
+				if (subfile.Format == null)
+					FileManager.AssignBestFormat(subfile);
+
+				if (subfile.Format != null)
+					subfile.Format.Read();
+
+				if (subfile.Files.Count > 0 || subfile.Folders.Count > 0)
+					ReadAll(subfile);
+			}
+
+			foreach (GameFolder subfolder in container.Folders)
+				ReadAll(subfolder);
+		}
+
+		private static void ExtractFolder(string outputDir, FileContainer folder)
 		{
 			string folderDir = Path.Combine(outputDir, folder.Name);
 			Directory.CreateDirectory(folderDir);
 
-			foreach (GameFile file in folder.Files)
-				file.Stream.WriteTo(Path.Combine(folderDir, file.Name));
+			foreach (GameFile subfile in folder.Files) {
+				if (subfile.Files.Count > 1 || subfile.Folders.Count > 0) {
+					ExtractFolder(folderDir, subfile);
+				} else if (subfile.Files.Count == 1) {
+					GameFile f = subfile.Files.First() as GameFile;
+					f.Stream.WriteTo(Path.Combine(folderDir, f.Name));
+				} else {
+					subfile.Stream.WriteTo(Path.Combine(folderDir, subfile.Name));
+				}
+			}
 
 			foreach (GameFolder subfolder in folder.Folders)
 				ExtractFolder(folderDir, subfolder);
