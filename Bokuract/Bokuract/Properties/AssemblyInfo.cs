@@ -23,6 +23,7 @@ using System.Runtime.CompilerServices;
 
 // Information about this assembly is defined by the following attributes.
 // Change them to the values specific to your project.
+using Mono.Addins;
 
 [assembly: AssemblyTitle("Bokuract")]
 [assembly: AssemblyDescription("")]
@@ -45,3 +46,6 @@ using System.Runtime.CompilerServices;
 //[assembly: AssemblyDelaySign(false)]
 //[assembly: AssemblyKeyFile("")]
 
+// Mono.Addins
+[assembly: Addin]
+[assembly: AddinDependency("libgame", "0.4")]

@@ -32,7 +32,7 @@ namespace Bokuract
 		public static int Padding { get { return 0x800; } }
 		public override string FormatName { get { return "Boku1.DIF"; } }
 
-		public string Type     { get { return "DFI"; } }
+		public static string Type     { get { return "DFI"; } }
 		public uint   Unknown  { get; set; }
 		public CdIndexEntry[] Entries { get; set; }
 
@@ -42,7 +42,7 @@ namespace Bokuract
 
 			// Read header
 			string type = reader.ReadString(4);
-			if (type != this.Type) throw new FormatException();
+			if (type != Type) throw new FormatException();
 			this.Unknown = reader.ReadUInt32();
 			strIn.Seek(8, SeekMode.Current);
 

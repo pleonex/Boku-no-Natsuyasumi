@@ -31,18 +31,19 @@ namespace Bokuract
 	{
 		public static void Main(string[] args)
 		{
+			GameFolder root = new GameFolder("boku1");
+			root.Tags["_Device_"] = "PSP";
+
 			DataStream indexStream = new DataStream("cdimg.idx", FileMode.Open, FileAccess.Read);
-			GameFile index = new GameFile("cdimg.idx", indexStream);
-			index.SetFormat(typeof(CdIndex));
-			index.Format.Read();
+			root.AddFile(new GameFile("cdimg.idx", indexStream));
 
 			DataStream dataStream = new DataStream("cdimg0.img", FileMode.Open, FileAccess.Read);
-			GameFile data = new GameFile("cdimg0.img", dataStream);
-			data.AddDependency(index);
-			data.SetFormat(typeof(CdData));
-			data.Format.Read();
+			root.AddFile(new GameFile("cdimg0.img", dataStream));
 
-			ExtractFolder(".", (GameFolder)data.Folders.First());
+			FileManager.Initialize(root, new FileInfoCollection());
+			GameFile file = FileManager.GetInstance().RescueFile("/boku1/cdimg0.img");
+			file.Format.Read();
+			ExtractFolder(".", (GameFolder)file.Folders.First());
 		}
 
 		private static void ExtractFolder(string outputDir, GameFolder folder)
