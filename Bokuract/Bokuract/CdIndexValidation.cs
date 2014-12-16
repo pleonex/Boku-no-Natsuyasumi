@@ -34,8 +34,9 @@ namespace Bokuract
 			get { return typeof(CdIndex); }
 		}
 
-		protected override void GuessDependencies(GameFile file)
+		protected override string[] GuessDependencies(GameFile file)
 		{
+			return null;
 		}
 
 		protected override object[] GuessParameters(GameFile file)

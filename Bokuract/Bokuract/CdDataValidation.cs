@@ -31,9 +31,9 @@ namespace Bokuract
 			get { return typeof(CdData); }
 		}
 
-		protected override void GuessDependencies(GameFile file)
+		protected override string[] GuessDependencies(GameFile file)
 		{
-			this.dependencies.Add("/boku1/cdimg.idx");
+			return new string[] { "/root/cdimg.idx" };
 		}
 
 		protected override object[] GuessParameters(GameFile file)

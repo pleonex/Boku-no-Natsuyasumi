@@ -23,6 +23,7 @@ using Mono.Addins;
 using Libgame;
 using System.IO;
 using System.Collections.Generic;
+using Libgame.IO;
 
 namespace Bokuract
 {
@@ -33,8 +34,9 @@ namespace Bokuract
 			get { return typeof(GZip); }
 		}
 
-		protected override void GuessDependencies(GameFile file)
+		protected override string[] GuessDependencies(GameFile file)
 		{
+			return null;
 		}
 
 		protected override object[] GuessParameters(GameFile file)
@@ -42,9 +44,11 @@ namespace Bokuract
 			return null;
 		}
 
-		protected override ValidationResult TestByData(Libgame.IO.DataStream stream)
+		protected override ValidationResult TestByData(DataStream stream)
 		{
-			return ValidationResult.Invalid;
+			stream.Seek(4, SeekMode.Origin);
+			return (new DataReader(stream).ReadUInt16() == 0x8b1f) ?
+				ValidationResult.CouldBe : ValidationResult.No;
 		}
 
 		protected override ValidationResult TestByRegexp(string filepath, string filename)

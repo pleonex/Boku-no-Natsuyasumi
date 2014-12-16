@@ -54,10 +54,7 @@ namespace Bokuract
             
             if (writtenBytes != decodedSize)
 				throw new FormatException("Decoded size doesn't match.");
-            
-			//if (strIn.Position < strIn.Length)
-			//	throw new FormatException("There are data to process still.");
-				
+
 			this.File.AddFile(new GameFile(gzip.FileName, strOut));
         }
 
