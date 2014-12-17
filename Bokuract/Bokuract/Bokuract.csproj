@@ -48,6 +48,8 @@
     <Compile Include="CdDataValidation.cs" />
     <Compile Include="GZip.cs" />
     <Compile Include="GZipValidation.cs" />
+    <Compile Include="Pack.cs" />
+    <Compile Include="PackValidation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
