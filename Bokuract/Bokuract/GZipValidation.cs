@@ -53,7 +53,8 @@ namespace Bokuract
 
 		protected override ValidationResult TestByRegexp(string filepath, string filename)
 		{
-			return (filename.EndsWith(".gzx")) ? ValidationResult.Sure : ValidationResult.No;
+			return (filename.EndsWith(".gzx") || filename.EndsWith(".gz")) ?
+				ValidationResult.Sure : ValidationResult.No;
 		}
 
 		protected override ValidationResult TestByTags(IDictionary<string, object> tags)

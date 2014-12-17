@@ -36,9 +36,9 @@ namespace Bokuract
 
 		public override void Read(DataStream strIn)
 		{
-			uint decodedSize = new DataReader(strIn).ReadUInt32();
-            uint writtenBytes = 0;
-            
+			if (this.File.Name.EndsWith(".gzx"))
+				strIn.Seek(4, SeekMode.Origin); // Decode size, no needed
+
 			DataStream strOut = new DataStream(new MemoryStream(), 0, 0);
             GZipStream gzip   = new GZipStream(strIn.BaseStream, CompressionMode.Decompress, true);
 
@@ -46,15 +46,10 @@ namespace Bokuract
             byte[] buffer = new byte[1024*10];
             do {
 				count = gzip.Read(buffer, 0, buffer.Length);
-                if (count != 0) {
+                if (count != 0)
                     strOut.Write(buffer, 0, count);
-					writtenBytes += (uint)count;
-                }
             } while (count > 0);
             
-            if (writtenBytes != decodedSize)
-				throw new FormatException("Decoded size doesn't match.");
-
 			this.File.AddFile(new GameFile(gzip.FileName, strOut));
         }
 
