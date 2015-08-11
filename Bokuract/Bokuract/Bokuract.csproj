@@ -31,11 +31,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Mono.Addins">
-      <HintPath>..\libgame\bin\Debug\Mono.Addins.dll</HintPath>
-    </Reference>
     <Reference Include="Ionic.Zlib">
       <HintPath>..\Ionic.Zlib.dll</HintPath>
+    </Reference>
+    <Reference Include="libgame">
+      <HintPath>..\libgame\bin\Debug\libgame.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Addins">
+      <HintPath>..\packages\Mono.Addins.1.2\lib\net40\Mono.Addins.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -53,9 +56,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\libgame\libgame.csproj">
-      <Project>{47373F3F-6A6A-4B2A-B06E-971D9FBDB545}</Project>
-      <Name>libgame</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
