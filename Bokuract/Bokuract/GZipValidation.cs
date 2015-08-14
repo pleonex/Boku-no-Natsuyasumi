@@ -46,6 +46,9 @@ namespace Bokuract
 
 		protected override ValidationResult TestByData(DataStream stream)
 		{
+            if (stream.Length < 6)
+                return ValidationResult.No;
+            
 			stream.Seek(4, SeekMode.Origin);
 			return (new DataReader(stream).ReadUInt16() == 0x8b1f) ?
 				ValidationResult.CouldBe : ValidationResult.No;
