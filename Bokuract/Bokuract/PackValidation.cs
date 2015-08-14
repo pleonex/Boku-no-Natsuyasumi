@@ -51,8 +51,26 @@ namespace Bokuract
 		protected override ValidationResult TestByRegexp(string filepath, string filename)
 		{
 			string dirname = Path.GetDirectoryName(filepath);
-			return dirname.EndsWith("cdimg0.img/map/gz") ?
-				ValidationResult.Sure : ValidationResult.No;
+
+            if (dirname.EndsWith("cdimg0.img/map/gz"))
+                return ValidationResult.Sure;
+
+            if (filename.StartsWith("day") && filename.EndsWith(".bin"))
+                return ValidationResult.Sure;
+
+            if (filename.StartsWith("saveload") && filename.EndsWith(".bin"))
+                return ValidationResult.Sure;
+
+            if (filename.EndsWith(".mrg"))
+                return ValidationResult.Sure;
+
+            if (filename == "full_pack.bin" || filename == "all_tex.bin" || filename == "jumbo.bin")
+                return ValidationResult.Sure;
+
+            if (filename == "startup.bin")
+                return ValidationResult.Sure;
+
+            return ValidationResult.No;
 		}
 
 		protected override ValidationResult TestByTags(IDictionary<string, object> tags)
