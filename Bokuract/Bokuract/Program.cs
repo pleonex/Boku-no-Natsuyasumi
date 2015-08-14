@@ -20,74 +20,81 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using Libgame;
-using Libgame.IO;
 using System.IO;
-using System.Linq;
-using Mono.Addins;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Bokuract
 {
-	class MainClass
-	{
-		public static void Main(string[] args)
-		{
-			// First args is the path input & output
-			if (args.Length == 0)
-				return;
+    class MainClass
+    {
+        public static void Main(string[] args)
+        {
+            // First args is the path input & output folder
+            if (args.Length == 0)
+                return;
 
-			// Create system folder
-			GameFolder root = GameFolderFactory.FromPath(args[0], "root");
-			root.AssignTagsRecursive(new Dictionary<string, object>() { {"_Device_", "PSP"} });
+            Stopwatch watch = Stopwatch.StartNew();
 
-			// Initialize file manager
-			FileManager.Initialize(root, new FileInfoCollection());
-			FileManager manager = FileManager.GetInstance();
+            string folder = args[0];
 
-			// Gets file and read it
-			GameFile file = manager.RescueFile("/root/cdimg0.img");
-			file.Format.Read();
+            // Create system folder
+            GameFolder root = GameFolderFactory.FromPath(folder, "root");
+            root.AssignTagsRecursive(
+                new Dictionary<string, object> { {"_Device_", "PSP"} });
 
-			// Extract files
-			ReadAll(root);
-			ExtractFolder(args[0], root);
-		}
+            // Initialize file manager
+            FileManager.Initialize(root, new FileInfoCollection());
+            FileManager manager = FileManager.GetInstance();
 
-		private static void ReadAll(FileContainer container)
-		{
-			foreach (GameFile subfile in container.Files) {
-				if (subfile.Format == null)
-					FileManager.AssignBestFormat(subfile);
+            // Gets file and read it
+            GameFile file = manager.RescueFile("/root/cdimg0.img");
+            file.Format.Read();
 
-				if (subfile.Format != null)
-					subfile.Format.Read();
+            // Extract files
+            Console.WriteLine("Reading files...");
+            ReadAll(root);
 
-				if (subfile.Files.Count > 0 || subfile.Folders.Count > 0)
-					ReadAll(subfile);
-			}
+            Console.WriteLine("Writing files...");
+            ExtractFolder(folder, root);
 
-			foreach (GameFolder subfolder in container.Folders)
-				ReadAll(subfolder);
-		}
+            watch.Stop();
+            Console.WriteLine("Done! It took: {0}", watch.Elapsed);
+        }
 
-		private static void ExtractFolder(string outputDir, FileContainer folder)
-		{
-			string folderDir = Path.Combine(outputDir, folder.Name);
-			Directory.CreateDirectory(folderDir);
+        private static void ReadAll(FileContainer container)
+        {
+            foreach (GameFile subfile in container.Files) {
+                if (subfile.Format == null)
+                    FileManager.AssignBestFormat(subfile);
 
-			foreach (GameFile subfile in folder.Files) {
-				if (subfile.Files.Count > 1 || subfile.Folders.Count > 0) {
-					ExtractFolder(folderDir, subfile);
-				} else if (subfile.Files.Count == 1) {
-					GameFile f = subfile.Files.First() as GameFile;
-					f.Stream.WriteTo(Path.Combine(folderDir, f.Name));
-				} else {
-					subfile.Stream.WriteTo(Path.Combine(folderDir, subfile.Name));
-				}
-			}
+                if (subfile.Format != null)
+                    subfile.Format.Read();
 
-			foreach (GameFolder subfolder in folder.Folders)
-				ExtractFolder(folderDir, subfolder);
-		}
-	}
+                if (subfile.Files.Count > 0 || subfile.Folders.Count > 0)
+                    ReadAll(subfile);
+            }
+
+            foreach (GameFolder subfolder in container.Folders)
+                ReadAll(subfolder);
+        }
+
+        private static void ExtractFolder(string output, FileContainer folder)
+        {
+            string folderDir = Path.Combine(output, folder.Name);
+            Directory.CreateDirectory(folderDir);
+
+            foreach (GameFile subfile in folder.Files) {
+                if (subfile.Files.Count > 0 || subfile.Folders.Count > 0) {
+                    ExtractFolder(folderDir, subfile);
+                } else if (subfile.Length > 0) {
+                    string filepath = Path.Combine(folderDir, subfile.Name);
+                    subfile.Stream.WriteTo(filepath);
+                }
+            }
+
+            foreach (GameFolder subfolder in folder.Folders)
+                ExtractFolder(folderDir, subfolder);
+        }
+    }
 }
