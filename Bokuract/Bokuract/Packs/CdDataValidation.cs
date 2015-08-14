@@ -19,24 +19,21 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Collections.Generic;
-using System.IO;
-using Libgame;
-using Libgame.IO;
 using Mono.Addins;
+using Libgame;
 
-namespace Bokuract
+namespace Bokuract.Packs
 {
 	[Extension]
-	public class CdIndexValidation : FormatValidation
+	public class CdDataValidation : FormatValidation
 	{
 		public override Type FormatType {
-			get { return typeof(CdIndex); }
+			get { return typeof(CdData); }
 		}
 
 		protected override string[] GuessDependencies(GameFile file)
 		{
-			return null;
+			return new string[] { "/root/cdimg.idx" };
 		}
 
 		protected override object[] GuessParameters(GameFile file)
@@ -44,18 +41,17 @@ namespace Bokuract
 			return null;
 		}
 
-		protected override ValidationResult TestByData(DataStream stream)
+		protected override ValidationResult TestByData(Libgame.IO.DataStream stream)
 		{
-			string type = new DataReader(stream).ReadString(4);
-			return (type == CdIndex.Type) ? ValidationResult.Sure : ValidationResult.No;
+			return ValidationResult.Invalid;
 		}
 
 		protected override ValidationResult TestByRegexp(string filepath, string filename)
 		{
-			return (filename == "cdimg.idx") ? ValidationResult.Sure : ValidationResult.No;
+			return (filename == "cdimg0.img") ? ValidationResult.Sure : ValidationResult.No;
 		}
 
-		protected override ValidationResult TestByTags(IDictionary<string, object> tags)
+		protected override ValidationResult TestByTags(System.Collections.Generic.IDictionary<string, object> tags)
 		{
 			return ((string)tags["_Device_"] == "PSP") ? 
 				ValidationResult.CouldBe : ValidationResult.Invalid;

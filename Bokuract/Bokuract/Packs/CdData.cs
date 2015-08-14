@@ -24,7 +24,7 @@ using Mono.Addins;
 using Libgame.IO;
 using System.Collections.Generic;
 
-namespace Bokuract
+namespace Bokuract.Packs
 {
 	[Extension]
 	public class CdData : Format

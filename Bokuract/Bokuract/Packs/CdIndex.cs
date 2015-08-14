@@ -24,7 +24,7 @@ using Libgame;
 using Libgame.IO;
 using System.Collections.Generic;
 
-namespace Bokuract
+namespace Bokuract.Packs
 {
 	[Extension]
 	public class CdIndex : Format
