@@ -1,5 +1,5 @@
 ﻿//
-//  GZip.cs
+//  Pack.cs
 //
 //  Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -19,39 +19,37 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.IO;
-using Ionic.Zlib;
 using Mono.Addins;
 using Libgame;
 using Libgame.IO;
 
-namespace Bokuract
+namespace Bokuract.Packs
 {
 	[Extension]
-	public class GZip : Format
+	public class Pack : Format
 	{
 		public override string FormatName {
-			get { return "Boku1.GZip"; }
+			get { return "Boku1.Pack"; }
 		}
 
 		public override void Read(DataStream strIn)
 		{
-			if (this.File.Name.EndsWith(".gzx"))
-				strIn.Seek(4, SeekMode.Origin); // Decode size, no needed
+			DataReader reader = new DataReader(strIn);
 
-			DataStream strOut = new DataStream(new MemoryStream(), 0, 0);
-            GZipStream gzip   = new GZipStream(strIn.BaseStream, CompressionMode.Decompress, true);
+			int numFiles = reader.ReadInt32();
+			for (int i = 0; i < numFiles; i++) {
+				strIn.Seek(4 + i * 0xC, SeekMode.Origin);
 
-            int count = 0;
-            byte[] buffer = new byte[1024*10];
-            do {
-				count = gzip.Read(buffer, 0, buffer.Length);
-                if (count != 0)
-                    strOut.Write(buffer, 0, count);
-            } while (count > 0);
-            
-			this.File.AddFile(new GameFile(gzip.FileName, strOut));
-        }
+				uint offset     = reader.ReadUInt32();
+				uint size       = reader.ReadUInt32();
+				uint nameOffset = reader.ReadUInt32();
+				strIn.Seek(nameOffset, SeekMode.Origin);
+				string filename = reader.ReadString();
+
+				DataStream fileStream = new DataStream(strIn, offset, size);
+				this.File.AddFile(new GameFile(filename, fileStream));
+			}
+		}
 
 		public override void Write(DataStream strOut)
 		{
@@ -71,5 +69,6 @@ namespace Bokuract
 		protected override void Dispose(bool freeManagedResourcesAlso)
 		{
 		}
-    }
+	}
 }
+

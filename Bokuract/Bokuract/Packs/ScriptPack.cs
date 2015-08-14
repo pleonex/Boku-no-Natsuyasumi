@@ -23,7 +23,7 @@ using Mono.Addins;
 using Libgame;
 using Libgame.IO;
 
-namespace Bokuract
+namespace Bokuract.Packs
 {
     [Extension]
     public class ScriptPack : Format

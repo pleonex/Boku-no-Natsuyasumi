@@ -49,12 +49,12 @@
     <Compile Include="Packs/CdIndex.cs" />
     <Compile Include="Packs/CdIndexValidation.cs" />
     <Compile Include="Packs/CdDataValidation.cs" />
-    <Compile Include="GZip.cs" />
-    <Compile Include="GZipValidation.cs" />
-    <Compile Include="Pack.cs" />
-    <Compile Include="PackValidation.cs" />
-    <Compile Include="ScriptPack.cs" />
-    <Compile Include="ScriptPackValidation.cs" />
+    <Compile Include="Packs/GZip.cs" />
+    <Compile Include="Packs/GZipValidation.cs" />
+    <Compile Include="Packs/Pack.cs" />
+    <Compile Include="Packs/PackValidation.cs" />
+    <Compile Include="Packs/ScriptPack.cs" />
+    <Compile Include="Packs/ScriptPackValidation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

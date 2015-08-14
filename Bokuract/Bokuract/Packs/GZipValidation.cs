@@ -25,7 +25,7 @@ using System.IO;
 using System.Collections.Generic;
 using Libgame.IO;
 
-namespace Bokuract
+namespace Bokuract.Packs
 {
 	[Extension]
 	public class GZipValidation : FormatValidation

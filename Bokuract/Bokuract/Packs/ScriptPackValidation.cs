@@ -24,7 +24,7 @@ using Mono.Addins;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Bokuract
+namespace Bokuract.Packs
 {
     [Extension]
     public class ScriptPackValidation : FormatValidation
