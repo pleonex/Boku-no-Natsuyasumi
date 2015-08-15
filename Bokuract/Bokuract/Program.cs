@@ -23,6 +23,7 @@ using Libgame;
 using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace Bokuract
 {
@@ -44,6 +45,7 @@ namespace Bokuract
                 new Dictionary<string, object> { {"_Device_", "PSP"} });
 
             // Initialize file manager
+            InitializeConfiguration();
             FileManager.Initialize(root, new FileInfoCollection());
             FileManager manager = FileManager.GetInstance();
 
@@ -90,11 +92,33 @@ namespace Bokuract
                 } else if (subfile.Length > 0) {
                     string filepath = Path.Combine(folderDir, subfile.Name);
                     subfile.Stream.WriteTo(filepath);
+
+                    if (subfile.Format is Bokuract.Scripts.Script)
+                        subfile.Format.Export(filepath + ".xml");
                 }
             }
 
             foreach (GameFolder subfolder in folder.Folders)
                 ExtractFolder(folderDir, subfolder);
+        }
+
+        private static void InitializeConfiguration()
+        {
+            // This is totally unnecessary in this case. 
+            // I must change it in the libgame project.
+            XElement root = new XElement("GameChanges");
+            root.Add(new XElement("RelativePaths"));
+            root.Add(new XElement("CharTables"));
+
+            XElement specialChars = new XElement("SpecialChars");
+            specialChars.Add(new XElement("Ellipsis"));
+            specialChars.Add(new XElement("QuoteOpen", "\""));
+            specialChars.Add(new XElement("QuoteClose", "\""));
+            specialChars.Add(new XElement("FuriganaOpen", "["));
+            specialChars.Add(new XElement("FuriganaClose", "]"));
+            root.Add(specialChars);
+
+            Configuration.Initialize(new XDocument(root));
         }
     }
 }

@@ -83,7 +83,7 @@ namespace Bokuract.Scripts
 
                 List<ushort> dialogData = new List<ushort>();
                 ushort value = reader.ReadUInt16();
-                while (value != 0xFFFF && value != 0x0000) {
+                while (value != 0x8000 && value != 0xFFFF && value != 0x0000) {
                     dialogData.Add(value);
                     value = reader.ReadUInt16();
                 }
@@ -106,7 +106,15 @@ namespace Bokuract.Scripts
 
         protected override void Export(XElement root)
         {
-            throw new NotImplementedException();
+            foreach (Dialog dialog in dialogs) {
+                XElement xdialog = new XElement("Dialog");
+                root.Add(xdialog);
+
+                xdialog.SetAttributeValue("ID", dialog.Id);
+                foreach (string id in dialog.Text.Keys)
+                    xdialog.Add(
+                        new XElement("Text", dialog.Text[id].ToXmlString(2, '[', ']')));
+            }
         }
 
 
@@ -157,6 +165,7 @@ namespace Bokuract.Scripts
                         stringer.Append(Table.GetChar(data[i]));
                 }
 
+                stringer.Replace("\0", "");
                 return stringer.ToString();
             }
         }
