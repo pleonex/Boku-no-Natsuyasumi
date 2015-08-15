@@ -24,38 +24,38 @@ using Libgame;
 
 namespace Bokuract.Packs
 {
-	[Extension]
-	public class CdDataValidation : FormatValidation
-	{
-		public override Type FormatType {
-			get { return typeof(CdData); }
-		}
+    [Extension]
+    public class CdDataValidation : FormatValidation
+    {
+        public override Type FormatType {
+            get { return typeof(CdData); }
+        }
 
-		protected override string[] GuessDependencies(GameFile file)
-		{
-			return new string[] { "/root/cdimg.idx" };
-		}
+        protected override string[] GuessDependencies(GameFile file)
+        {
+            return new string[] { "/root/cdimg.idx" };
+        }
 
-		protected override object[] GuessParameters(GameFile file)
-		{
-			return null;
-		}
+        protected override object[] GuessParameters(GameFile file)
+        {
+            return null;
+        }
 
-		protected override ValidationResult TestByData(Libgame.IO.DataStream stream)
-		{
-			return ValidationResult.Invalid;
-		}
+        protected override ValidationResult TestByData(Libgame.IO.DataStream stream)
+        {
+            return ValidationResult.Invalid;
+        }
 
-		protected override ValidationResult TestByRegexp(string filepath, string filename)
-		{
-			return (filename == "cdimg0.img") ? ValidationResult.Sure : ValidationResult.No;
-		}
+        protected override ValidationResult TestByRegexp(string filepath, string filename)
+        {
+            return (filename == "cdimg0.img") ? ValidationResult.Sure : ValidationResult.No;
+        }
 
-		protected override ValidationResult TestByTags(System.Collections.Generic.IDictionary<string, object> tags)
-		{
-			return ((string)tags["_Device_"] == "PSP") ? 
-				ValidationResult.CouldBe : ValidationResult.Invalid;
-		}
-	}
+        protected override ValidationResult TestByTags(System.Collections.Generic.IDictionary<string, object> tags)
+        {
+            return ((string)tags["_Device_"] == "PSP") ? 
+                ValidationResult.CouldBe : ValidationResult.Invalid;
+        }
+    }
 }
 

@@ -26,73 +26,73 @@ using System.Collections.Generic;
 
 namespace Bokuract.Packs
 {
-	[Extension]
-	public class CdIndex : Format
-	{
-		public static int Padding { get { return 0x800; } }
-		public override string FormatName { get { return "Boku1.DIF"; } }
+    [Extension]
+    public class CdIndex : Format
+    {
+        public static int Padding { get { return 0x800; } }
+        public override string FormatName { get { return "Boku1.DIF"; } }
 
-		public static string Type     { get { return "DFI"; } }
-		public uint   Unknown  { get; set; }
-		public CdIndexEntry[] Entries { get; set; }
+        public static string Type     { get { return "DFI"; } }
+        public uint   Unknown  { get; set; }
+        public CdIndexEntry[] Entries { get; set; }
 
-		public override void Read(DataStream strIn)
-		{
-			DataReader reader = new DataReader(strIn);
+        public override void Read(DataStream strIn)
+        {
+            DataReader reader = new DataReader(strIn);
 
-			// Read header
-			string type = reader.ReadString(4);
-			if (type != Type) throw new FormatException();
-			this.Unknown = reader.ReadUInt32();
-			strIn.Seek(8, SeekMode.Current);
+            // Read header
+            string type = reader.ReadString(4);
+            if (type != Type) throw new FormatException();
+            this.Unknown = reader.ReadUInt32();
+            strIn.Seek(8, SeekMode.Current);
 
-			// Use the name offset of the main entry to get number of entries and skip it
-			strIn.Seek(4, SeekMode.Current);
-			int numEntries = reader.ReadInt32() / CdIndexEntry.EntrySize;
-			strIn.Seek(8, SeekMode.Current);
+            // Use the name offset of the main entry to get number of entries and skip it
+            strIn.Seek(4, SeekMode.Current);
+            int numEntries = reader.ReadInt32() / CdIndexEntry.EntrySize;
+            strIn.Seek(8, SeekMode.Current);
 
-			// Read entries
-			this.Entries = new CdIndexEntry[numEntries - 1];
-			for (int i = 0; i < this.Entries.Length; i++)
-				this.Entries[i] = ReadEntry(reader);
-		}
+            // Read entries
+            this.Entries = new CdIndexEntry[numEntries - 1];
+            for (int i = 0; i < this.Entries.Length; i++)
+                this.Entries[i] = ReadEntry(reader);
+        }
 
-		private CdIndexEntry ReadEntry(DataReader reader)
-		{
-			long entryOffset = reader.Stream.Position;
-			CdIndexEntry entry = new CdIndexEntry();
+        private CdIndexEntry ReadEntry(DataReader reader)
+        {
+            long entryOffset = reader.Stream.Position;
+            CdIndexEntry entry = new CdIndexEntry();
 
-			entry.IsFolder   = (reader.ReadUInt16() == 1);
-			entry.SubEntries = reader.ReadUInt16();
-			entry.IsLastFile = (entry.SubEntries == 0);
-			long nameOffset  = entryOffset + reader.ReadUInt32();
-			entry.Offset     = reader.ReadUInt32() * Padding;
-			entry.Size       = reader.ReadUInt32();
+            entry.IsFolder   = (reader.ReadUInt16() == 1);
+            entry.SubEntries = reader.ReadUInt16();
+            entry.IsLastFile = (entry.SubEntries == 0);
+            long nameOffset  = entryOffset + reader.ReadUInt32();
+            entry.Offset     = reader.ReadUInt32() * Padding;
+            entry.Size       = reader.ReadUInt32();
 
-			reader.Stream.Seek(nameOffset, SeekMode.Origin);
-			entry.Name = reader.ReadString();
-			reader.Stream.Seek(entryOffset + CdIndexEntry.EntrySize, SeekMode.Origin);
+            reader.Stream.Seek(nameOffset, SeekMode.Origin);
+            entry.Name = reader.ReadString();
+            reader.Stream.Seek(entryOffset + CdIndexEntry.EntrySize, SeekMode.Origin);
 
-			return entry;
-		}
+            return entry;
+        }
 
-		public override void Write(DataStream strOut)
-		{
-			throw new NotImplementedException();
-		}
+        public override void Write(DataStream strOut)
+        {
+            throw new NotImplementedException();
+        }
 
-		public override void Export(params DataStream[] strOut)
-		{
-			throw new NotImplementedException();
-		}
+        public override void Export(params DataStream[] strOut)
+        {
+            throw new NotImplementedException();
+        }
 
-		public override void Import(params DataStream[] strIn)
-		{
-			throw new NotImplementedException();
-		}
+        public override void Import(params DataStream[] strIn)
+        {
+            throw new NotImplementedException();
+        }
 
-		protected override void Dispose(bool freeManagedResourcesAlso)
-		{
-		}
-	}
+        protected override void Dispose(bool freeManagedResourcesAlso)
+        {
+        }
+    }
 }

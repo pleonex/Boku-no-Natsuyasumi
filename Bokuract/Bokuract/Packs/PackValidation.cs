@@ -26,31 +26,31 @@ using System.IO;
 
 namespace Bokuract.Packs
 {
-	[Extension]
-	public class PackValidation : FormatValidation
-	{
-		public override Type FormatType {
-			get { return typeof(Pack); }
-		}
+    [Extension]
+    public class PackValidation : FormatValidation
+    {
+        public override Type FormatType {
+            get { return typeof(Pack); }
+        }
 
-		protected override string[] GuessDependencies(GameFile file)
-		{
-			return null;
-		}
+        protected override string[] GuessDependencies(GameFile file)
+        {
+            return null;
+        }
 
-		protected override object[] GuessParameters(GameFile file)
-		{
-			return null;
-		}
+        protected override object[] GuessParameters(GameFile file)
+        {
+            return null;
+        }
 
-		protected override ValidationResult TestByData(Libgame.IO.DataStream stream)
-		{
-			return ValidationResult.Invalid;
-		}
+        protected override ValidationResult TestByData(Libgame.IO.DataStream stream)
+        {
+            return ValidationResult.Invalid;
+        }
 
-		protected override ValidationResult TestByRegexp(string filepath, string filename)
-		{
-			string dirname = Path.GetDirectoryName(filepath);
+        protected override ValidationResult TestByRegexp(string filepath, string filename)
+        {
+            string dirname = Path.GetDirectoryName(filepath);
 
             if (dirname.EndsWith("cdimg0.img/map/gz"))
                 return ValidationResult.Sure;
@@ -71,13 +71,13 @@ namespace Bokuract.Packs
                 return ValidationResult.Sure;
 
             return ValidationResult.No;
-		}
+        }
 
-		protected override ValidationResult TestByTags(IDictionary<string, object> tags)
-		{
-			return ((string)tags["_Device_"] == "PSP") ?
-				ValidationResult.CouldBe : ValidationResult.No;
-		}
-	}
+        protected override ValidationResult TestByTags(IDictionary<string, object> tags)
+        {
+            return ((string)tags["_Device_"] == "PSP") ?
+                ValidationResult.CouldBe : ValidationResult.No;
+        }
+    }
 }
 

@@ -27,43 +27,43 @@ using Libgame.IO;
 
 namespace Bokuract.Packs
 {
-	[Extension]
-	public class GZipValidation : FormatValidation
-	{
-		public override Type FormatType {
-			get { return typeof(GZip); }
-		}
+    [Extension]
+    public class GZipValidation : FormatValidation
+    {
+        public override Type FormatType {
+            get { return typeof(GZip); }
+        }
 
-		protected override string[] GuessDependencies(GameFile file)
-		{
-			return null;
-		}
+        protected override string[] GuessDependencies(GameFile file)
+        {
+            return null;
+        }
 
-		protected override object[] GuessParameters(GameFile file)
-		{
-			return null;
-		}
+        protected override object[] GuessParameters(GameFile file)
+        {
+            return null;
+        }
 
-		protected override ValidationResult TestByData(DataStream stream)
-		{
+        protected override ValidationResult TestByData(DataStream stream)
+        {
             if (stream.Length < 6)
                 return ValidationResult.No;
             
-			stream.Seek(4, SeekMode.Origin);
-			return (new DataReader(stream).ReadUInt16() == 0x8b1f) ?
-				ValidationResult.CouldBe : ValidationResult.No;
-		}
+            stream.Seek(4, SeekMode.Origin);
+            return (new DataReader(stream).ReadUInt16() == 0x8b1f) ?
+                ValidationResult.CouldBe : ValidationResult.No;
+        }
 
-		protected override ValidationResult TestByRegexp(string filepath, string filename)
-		{
-			return (filename.EndsWith(".gzx") || filename.EndsWith(".gz")) ?
-				ValidationResult.Sure : ValidationResult.No;
-		}
+        protected override ValidationResult TestByRegexp(string filepath, string filename)
+        {
+            return (filename.EndsWith(".gzx") || filename.EndsWith(".gz")) ?
+                ValidationResult.Sure : ValidationResult.No;
+        }
 
-		protected override ValidationResult TestByTags(IDictionary<string, object> tags)
-		{
-			return ((string)tags["_Device_"] == "PSP") ? ValidationResult.CouldBe : ValidationResult.No;
-		}
-	}
+        protected override ValidationResult TestByTags(IDictionary<string, object> tags)
+        {
+            return ((string)tags["_Device_"] == "PSP") ? ValidationResult.CouldBe : ValidationResult.No;
+        }
+    }
 }
 

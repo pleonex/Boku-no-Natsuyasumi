@@ -22,16 +22,16 @@ using System;
 
 namespace Bokuract.Packs
 {
-	public struct CdIndexEntry
-	{
-		public static int EntrySize { get { return 0x10; } }
+    public struct CdIndexEntry
+    {
+        public static int EntrySize { get { return 0x10; } }
 
-		public bool   IsFolder   { get; set; }
-		public bool   IsLastFile { get; set; }
-		public int    SubEntries { get; set; }
-		public string Name       { get; set; }
-		public long   Offset     { get; set; }
-		public long   Size       { get; set; }
-	}
+        public bool   IsFolder   { get; set; }
+        public bool   IsLastFile { get; set; }
+        public int    SubEntries { get; set; }
+        public string Name       { get; set; }
+        public long   Offset     { get; set; }
+        public long   Size       { get; set; }
+    }
 }
 

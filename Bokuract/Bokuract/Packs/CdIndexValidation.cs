@@ -27,39 +27,39 @@ using Mono.Addins;
 
 namespace Bokuract.Packs
 {
-	[Extension]
-	public class CdIndexValidation : FormatValidation
-	{
-		public override Type FormatType {
-			get { return typeof(CdIndex); }
-		}
+    [Extension]
+    public class CdIndexValidation : FormatValidation
+    {
+        public override Type FormatType {
+            get { return typeof(CdIndex); }
+        }
 
-		protected override string[] GuessDependencies(GameFile file)
-		{
-			return null;
-		}
+        protected override string[] GuessDependencies(GameFile file)
+        {
+            return null;
+        }
 
-		protected override object[] GuessParameters(GameFile file)
-		{
-			return null;
-		}
+        protected override object[] GuessParameters(GameFile file)
+        {
+            return null;
+        }
 
-		protected override ValidationResult TestByData(DataStream stream)
-		{
-			string type = new DataReader(stream).ReadString(4);
-			return (type == CdIndex.Type) ? ValidationResult.Sure : ValidationResult.No;
-		}
+        protected override ValidationResult TestByData(DataStream stream)
+        {
+            string type = new DataReader(stream).ReadString(4);
+            return (type == CdIndex.Type) ? ValidationResult.Sure : ValidationResult.No;
+        }
 
-		protected override ValidationResult TestByRegexp(string filepath, string filename)
-		{
-			return (filename == "cdimg.idx") ? ValidationResult.Sure : ValidationResult.No;
-		}
+        protected override ValidationResult TestByRegexp(string filepath, string filename)
+        {
+            return (filename == "cdimg.idx") ? ValidationResult.Sure : ValidationResult.No;
+        }
 
-		protected override ValidationResult TestByTags(IDictionary<string, object> tags)
-		{
-			return ((string)tags["_Device_"] == "PSP") ? 
-				ValidationResult.CouldBe : ValidationResult.Invalid;
-		}
-	}
+        protected override ValidationResult TestByTags(IDictionary<string, object> tags)
+        {
+            return ((string)tags["_Device_"] == "PSP") ? 
+                ValidationResult.CouldBe : ValidationResult.Invalid;
+        }
+    }
 }
 

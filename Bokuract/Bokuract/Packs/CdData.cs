@@ -26,60 +26,60 @@ using System.Collections.Generic;
 
 namespace Bokuract.Packs
 {
-	[Extension]
-	public class CdData : Format
-	{
-		public override string FormatName { get { return "Boku1.DIF_DATA"; } }
+    [Extension]
+    public class CdData : Format
+    {
+        public override string FormatName { get { return "Boku1.DIF_DATA"; } }
 
-		public GameFolder Root { get; private set; }
+        public GameFolder Root { get; private set; }
 
-		public override void Read(DataStream strIn)
-		{
-			CdIndex index = (CdIndex)File.Dependencies["cdimg.idx"].Format;
+        public override void Read(DataStream strIn)
+        {
+            CdIndex index = (CdIndex)File.Dependencies["cdimg.idx"].Format;
 
-			// Generate file system
-			Queue<CdIndexEntry> entries = new Queue<CdIndexEntry>(index.Entries);
-			while (entries.Count > 0)
-				GiveFormat(entries, this.File);
-		}
+            // Generate file system
+            Queue<CdIndexEntry> entries = new Queue<CdIndexEntry>(index.Entries);
+            while (entries.Count > 0)
+                GiveFormat(entries, this.File);
+        }
 
-		private void GiveFormat(Queue<CdIndexEntry> entries, FileContainer folder)
-		{
-			CdIndexEntry entry = entries.Dequeue();
-			if (!entry.IsFolder) {
-				folder.AddFile(new GameFile(
-					entry.Name,
-					new DataStream(this.File.Stream, entry.Offset, entry.Size)
-				));
-				return;
-			}
+        private void GiveFormat(Queue<CdIndexEntry> entries, FileContainer folder)
+        {
+            CdIndexEntry entry = entries.Dequeue();
+            if (!entry.IsFolder) {
+                folder.AddFile(new GameFile(
+                    entry.Name,
+                    new DataStream(this.File.Stream, entry.Offset, entry.Size)
+                ));
+                return;
+            }
 
-			// Create the folder
-			GameFolder currFolder = new GameFolder(entry.Name, folder);
+            // Create the folder
+            GameFolder currFolder = new GameFolder(entry.Name, folder);
 
-			// Add files and folders
-			for (int i = 0; i < entry.SubEntries - 1; i++)
-				GiveFormat(entries, currFolder);
-		}
+            // Add files and folders
+            for (int i = 0; i < entry.SubEntries - 1; i++)
+                GiveFormat(entries, currFolder);
+        }
 
-		public override void Write(DataStream strOut)
-		{
-			throw new NotImplementedException();
-		}
+        public override void Write(DataStream strOut)
+        {
+            throw new NotImplementedException();
+        }
 
-		public override void Export(params DataStream[] strOut)
-		{
-			throw new NotImplementedException();
-		}
+        public override void Export(params DataStream[] strOut)
+        {
+            throw new NotImplementedException();
+        }
 
-		public override void Import(params DataStream[] strIn)
-		{
-			throw new NotImplementedException();
-		}
+        public override void Import(params DataStream[] strIn)
+        {
+            throw new NotImplementedException();
+        }
 
-		protected override void Dispose(bool freeManagedResourcesAlso)
-		{
-		}
-	}
+        protected override void Dispose(bool freeManagedResourcesAlso)
+        {
+        }
+    }
 }
 

@@ -27,49 +27,49 @@ using Libgame.IO;
 
 namespace Bokuract.Packs
 {
-	[Extension]
-	public class GZip : Format
-	{
-		public override string FormatName {
-			get { return "Boku1.GZip"; }
-		}
+    [Extension]
+    public class GZip : Format
+    {
+        public override string FormatName {
+            get { return "Boku1.GZip"; }
+        }
 
-		public override void Read(DataStream strIn)
-		{
-			if (this.File.Name.EndsWith(".gzx"))
-				strIn.Seek(4, SeekMode.Origin); // Decode size, no needed
+        public override void Read(DataStream strIn)
+        {
+            if (this.File.Name.EndsWith(".gzx"))
+                strIn.Seek(4, SeekMode.Origin); // Decode size, no needed
 
-			DataStream strOut = new DataStream(new MemoryStream(), 0, 0);
+            DataStream strOut = new DataStream(new MemoryStream(), 0, 0);
             GZipStream gzip   = new GZipStream(strIn.BaseStream, CompressionMode.Decompress, true);
 
             int count = 0;
             byte[] buffer = new byte[1024*10];
             do {
-				count = gzip.Read(buffer, 0, buffer.Length);
+                count = gzip.Read(buffer, 0, buffer.Length);
                 if (count != 0)
                     strOut.Write(buffer, 0, count);
             } while (count > 0);
             
-			this.File.AddFile(new GameFile(gzip.FileName, strOut));
+            this.File.AddFile(new GameFile(gzip.FileName, strOut));
         }
 
-		public override void Write(DataStream strOut)
-		{
-			throw new NotImplementedException();
-		}
+        public override void Write(DataStream strOut)
+        {
+            throw new NotImplementedException();
+        }
 
-		public override void Import(params DataStream[] strIn)
-		{
-			throw new NotImplementedException();
-		}
+        public override void Import(params DataStream[] strIn)
+        {
+            throw new NotImplementedException();
+        }
 
-		public override void Export(params DataStream[] strOut)
-		{
-			throw new NotImplementedException();
-		}
+        public override void Export(params DataStream[] strOut)
+        {
+            throw new NotImplementedException();
+        }
 
-		protected override void Dispose(bool freeManagedResourcesAlso)
-		{
-		}
+        protected override void Dispose(bool freeManagedResourcesAlso)
+        {
+        }
     }
 }
