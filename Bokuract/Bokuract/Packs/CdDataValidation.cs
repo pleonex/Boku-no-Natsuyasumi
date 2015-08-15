@@ -19,8 +19,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using Mono.Addins;
+using System.Collections.Generic;
 using Libgame;
+using Mono.Addins;
 
 namespace Bokuract.Packs
 {
@@ -33,7 +34,7 @@ namespace Bokuract.Packs
 
         protected override string[] GuessDependencies(GameFile file)
         {
-            return new string[] { "/root/cdimg.idx" };
+            return new[] { "/root/cdimg.idx" };
         }
 
         protected override object[] GuessParameters(GameFile file)
@@ -48,10 +49,11 @@ namespace Bokuract.Packs
 
         protected override ValidationResult TestByRegexp(string filepath, string filename)
         {
-            return (filename == "cdimg0.img") ? ValidationResult.Sure : ValidationResult.No;
+            return (filename == "cdimg0.img") ?
+                ValidationResult.Sure : ValidationResult.No;
         }
 
-        protected override ValidationResult TestByTags(System.Collections.Generic.IDictionary<string, object> tags)
+        protected override ValidationResult TestByTags(IDictionary<string, object> tags)
         {
             return ((string)tags["_Device_"] == "PSP") ? 
                 ValidationResult.CouldBe : ValidationResult.Invalid;

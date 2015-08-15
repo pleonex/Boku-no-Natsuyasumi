@@ -19,11 +19,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using Mono.Addins;
-using Libgame;
-using System.IO;
 using System.Collections.Generic;
+using Libgame;
 using Libgame.IO;
+using Mono.Addins;
 
 namespace Bokuract.Packs
 {
@@ -62,7 +61,8 @@ namespace Bokuract.Packs
 
         protected override ValidationResult TestByTags(IDictionary<string, object> tags)
         {
-            return ((string)tags["_Device_"] == "PSP") ? ValidationResult.CouldBe : ValidationResult.No;
+            return ((string)tags["_Device_"] == "PSP") ?
+                ValidationResult.CouldBe : ValidationResult.No;
         }
     }
 }

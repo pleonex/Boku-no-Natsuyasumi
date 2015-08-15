@@ -21,9 +21,9 @@
 using System;
 using System.IO;
 using Ionic.Zlib;
-using Mono.Addins;
 using Libgame;
 using Libgame.IO;
+using Mono.Addins;
 
 namespace Bokuract.Packs
 {
@@ -40,7 +40,8 @@ namespace Bokuract.Packs
                 strIn.Seek(4, SeekMode.Origin); // Decode size, no needed
 
             DataStream strOut = new DataStream(new MemoryStream(), 0, 0);
-            GZipStream gzip   = new GZipStream(strIn.BaseStream, CompressionMode.Decompress, true);
+            GZipStream gzip   = new GZipStream(strIn.BaseStream,
+                CompressionMode.Decompress, true);
 
             int count = 0;
             byte[] buffer = new byte[1024*10];

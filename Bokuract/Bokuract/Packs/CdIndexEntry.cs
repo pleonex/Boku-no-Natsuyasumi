@@ -24,7 +24,9 @@ namespace Bokuract.Packs
 {
     public struct CdIndexEntry
     {
-        public static int EntrySize { get { return 0x10; } }
+        public static int EntrySize {
+            get { return 0x10; }
+        }
 
         public bool   IsFolder   { get; set; }
         public bool   IsLastFile { get; set; }

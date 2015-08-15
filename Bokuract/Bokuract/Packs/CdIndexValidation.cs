@@ -20,7 +20,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Libgame;
 using Libgame.IO;
 using Mono.Addins;
@@ -46,13 +45,18 @@ namespace Bokuract.Packs
 
         protected override ValidationResult TestByData(DataStream stream)
         {
+            if (stream.Length < 4)
+                return ValidationResult.No;
+
             string type = new DataReader(stream).ReadString(4);
-            return (type == CdIndex.Type) ? ValidationResult.Sure : ValidationResult.No;
+            return (type == CdIndex.Type) ?
+                ValidationResult.Sure : ValidationResult.No;
         }
 
         protected override ValidationResult TestByRegexp(string filepath, string filename)
         {
-            return (filename == "cdimg.idx") ? ValidationResult.Sure : ValidationResult.No;
+            return (filename == "cdimg.idx") ?
+                ValidationResult.Sure : ValidationResult.No;
         }
 
         protected override ValidationResult TestByTags(IDictionary<string, object> tags)

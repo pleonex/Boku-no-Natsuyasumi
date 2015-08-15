@@ -19,10 +19,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using Libgame;
-using Mono.Addins;
 using System.Collections.Generic;
 using System.IO;
+using Libgame;
+using Libgame.IO;
+using Mono.Addins;
 
 namespace Bokuract.Packs
 {
@@ -43,7 +44,7 @@ namespace Bokuract.Packs
             return null;
         }
 
-        protected override ValidationResult TestByData(Libgame.IO.DataStream stream)
+        protected override ValidationResult TestByData(DataStream stream)
         {
             return ValidationResult.Invalid;
         }

@@ -19,22 +19,36 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using Mono.Addins;
 using Libgame;
 using Libgame.IO;
-using System.Collections.Generic;
+using Mono.Addins;
 
 namespace Bokuract.Packs
 {
     [Extension]
     public class CdIndex : Format
     {
-        public static int Padding { get { return 0x800; } }
-        public override string FormatName { get { return "Boku1.DIF"; } }
+        public static int Padding {
+            get { return 0x800; }
+        }
 
-        public static string Type     { get { return "DFI"; } }
-        public uint   Unknown  { get; set; }
-        public CdIndexEntry[] Entries { get; set; }
+        public static string Type {
+            get { return "DFI"; }
+        }
+
+        public override string FormatName {
+            get { return "Boku1.DIF"; }
+        }
+            
+        public uint Unknown {
+            get;
+            set;
+        }
+
+        public CdIndexEntry[] Entries {
+            get;
+            set;
+        }
 
         public override void Read(DataStream strIn)
         {

@@ -19,9 +19,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using Mono.Addins;
 using Libgame;
 using Libgame.IO;
+using Mono.Addins;
 
 namespace Bokuract.Packs
 {
@@ -42,10 +42,10 @@ namespace Bokuract.Packs
 
                 uint offset     = reader.ReadUInt32();
                 uint size       = reader.ReadUInt32();
-                string filename = File.Name + "_" + i + ".dat";
+                string filename = this.File.Name + "_" + i + ".dat";
 
                 DataStream fileStream = new DataStream(strIn, offset, size);
-                File.AddFile(new GameFile(filename, fileStream));
+                this.File.AddFile(new GameFile(filename, fileStream));
             }
         }
 

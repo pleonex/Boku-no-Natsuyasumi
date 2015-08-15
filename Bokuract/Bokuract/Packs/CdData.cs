@@ -19,31 +19,36 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using Libgame;
-using Mono.Addins;
-using Libgame.IO;
 using System.Collections.Generic;
+using Libgame;
+using Libgame.IO;
+using Mono.Addins;
 
 namespace Bokuract.Packs
 {
     [Extension]
     public class CdData : Format
     {
-        public override string FormatName { get { return "Boku1.DIF_DATA"; } }
+        public override string FormatName {
+            get { return "Boku1.DIF_DATA"; }
+        }
 
-        public GameFolder Root { get; private set; }
+        public GameFolder Root {
+            get;
+            private set;
+        }
 
         public override void Read(DataStream strIn)
         {
             CdIndex index = (CdIndex)File.Dependencies["cdimg.idx"].Format;
 
             // Generate file system
-            Queue<CdIndexEntry> entries = new Queue<CdIndexEntry>(index.Entries);
+            var entries = new Queue<CdIndexEntry>(index.Entries);
             while (entries.Count > 0)
                 GiveFormat(entries, this.File);
         }
 
-        private void GiveFormat(Queue<CdIndexEntry> entries, FileContainer folder)
+        private void GiveFormat(Queue<CdIndexEntry> entries,FileContainer folder)
         {
             CdIndexEntry entry = entries.Dequeue();
             if (!entry.IsFolder) {
