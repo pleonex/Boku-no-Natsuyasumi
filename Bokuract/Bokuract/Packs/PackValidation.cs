@@ -30,6 +30,25 @@ namespace Bokuract.Packs
     [Extension]
     public class PackValidation : FormatValidation
     {
+        private static readonly RegexSimple[,] SupportedFilesWithSubName = {
+            { BuildRe("*/cdimg0.img/map/gz"),   null,                 null },
+            { null,                             BuildRe("startup"),   BuildRe(".bin") },
+            { null,                             BuildRe("full_pack"), BuildRe(".bin") },
+            { null,                             BuildRe("all_tex"),   BuildRe(".bin") },
+            { null,                             BuildRe("jumbo"),     BuildRe(".bin") },
+            { null,                             null,                 BuildRe(".mrg") },
+            { null,                             BuildRe("saveload"),  BuildRe(".bin") },
+            { null,                             BuildRe("day"),       BuildRe(".bin") },
+        };
+
+        private static readonly RegexSimple[,] SupportedFilesNoSubName = {
+            { BuildRe("*/cdimg0.img/map/gz/*"), BuildRe("M_*"),       BuildRe(".bin") },
+            { null,                             BuildRe("font"),      BuildRe(".bin") }
+        };
+
+        private static readonly Dictionary<string, bool> CachedFiles = 
+            new Dictionary<string, bool>();
+
         public override Type FormatType {
             get { return typeof(Pack); }
         }
@@ -41,7 +60,7 @@ namespace Bokuract.Packs
 
         protected override object[] GuessParameters(GameFile file)
         {
-            return null;
+            return new object[] { CachedFiles[file.Path] };
         }
 
         protected override ValidationResult TestByData(DataStream stream)
@@ -51,33 +70,58 @@ namespace Bokuract.Packs
 
         protected override ValidationResult TestByRegexp(string filepath, string filename)
         {
-            string dirname = Path.GetDirectoryName(filepath);
+            string dirname   = Path.GetDirectoryName(filepath);
+            string extension = Path.GetExtension(filename);
+            filename = Path.GetFileNameWithoutExtension(filename);
 
-            if (dirname.EndsWith("cdimg0.img/map/gz"))
-                return ValidationResult.Sure;
+            ValidationResult result = TestRegex(SupportedFilesWithSubName,
+                dirname, filename, extension);
+            
+            if (result == ValidationResult.Sure) {
+                CachedFiles[filepath] = true;
+            } else {
+                result = TestRegex(SupportedFilesNoSubName,
+                    dirname, filename, extension);
 
-            if (filename.StartsWith("day") && filename.EndsWith(".bin"))
-                return ValidationResult.Sure;
+                if (result == ValidationResult.Sure)
+                    CachedFiles[filepath] = false;
+            }
+           
+            return result;
+        }
 
-            if (filename.StartsWith("saveload") && filename.EndsWith(".bin"))
-                return ValidationResult.Sure;
+        private static ValidationResult TestRegex(RegexSimple[,] regex, string dirname,
+            string filename, string extension)
+        {
+            ValidationResult result = ValidationResult.No;
+            for (int i = 0; i < regex.GetLength(0) && result == ValidationResult.No; i++){
+                result = ValidationResult.Sure;
 
-            if (filename.EndsWith(".mrg"))
-                return ValidationResult.Sure;
+                if (regex[i, 0] != null)
+                    result = regex[i, 0].Match(dirname) ?
+                        ValidationResult.Sure : ValidationResult.No;
 
-            if (filename == "full_pack.bin" || filename == "all_tex.bin" || filename == "jumbo.bin")
-                return ValidationResult.Sure;
+                if (regex[i, 1] != null && result != ValidationResult.No)
+                    result = regex[i, 1].Match(filename) ?
+                        ValidationResult.Sure : ValidationResult.No;
 
-            if (filename == "startup.bin")
-                return ValidationResult.Sure;
+                if (regex[i, 2] != null && result != ValidationResult.No)
+                    result = regex[i, 2].Match(extension) ?
+                        ValidationResult.Sure : ValidationResult.No;
+            }
 
-            return ValidationResult.No;
+            return result;
         }
 
         protected override ValidationResult TestByTags(IDictionary<string, object> tags)
         {
             return ((string)tags["_Device_"] == "PSP") ?
                 ValidationResult.CouldBe : ValidationResult.No;
+        }
+
+        private static RegexSimple BuildRe(string regex)
+        {
+            return new RegexSimple(regex);   
         }
     }
 }

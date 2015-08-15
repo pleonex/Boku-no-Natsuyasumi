@@ -36,15 +36,24 @@ namespace Bokuract.Packs
         {
             DataReader reader = new DataReader(strIn);
 
+            bool withNames = (bool)this.parameters[0];
+            int entrySize = withNames ? 0x0C : 0x08;
+
             int numFiles = reader.ReadInt32();
             for (int i = 0; i < numFiles; i++) {
-                strIn.Seek(4 + i * 0xC, SeekMode.Origin);
+                strIn.Seek(4 + i * entrySize, SeekMode.Origin);
 
-                uint offset     = reader.ReadUInt32();
-                uint size       = reader.ReadUInt32();
-                uint nameOffset = reader.ReadUInt32();
-                strIn.Seek(nameOffset, SeekMode.Origin);
-                string filename = reader.ReadString();
+                uint offset = reader.ReadUInt32();
+                uint size   = reader.ReadUInt32();
+
+                string filename;
+                if (withNames) {
+                    uint nameOffset = reader.ReadUInt32();
+                    strIn.Seek(nameOffset, SeekMode.Origin);
+                    filename = reader.ReadString();
+                } else {
+                    filename = this.File.Name + "_" + i + ".dat";
+                }
 
                 DataStream fileStream = new DataStream(strIn, offset, size);
                 this.File.AddFile(new GameFile(filename, fileStream));

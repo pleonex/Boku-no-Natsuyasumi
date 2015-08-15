@@ -44,17 +44,17 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Packs/CdIndexEntry.cs" />
-    <Compile Include="Packs/CdData.cs" />
-    <Compile Include="Packs/CdIndex.cs" />
-    <Compile Include="Packs/CdIndexValidation.cs" />
-    <Compile Include="Packs/CdDataValidation.cs" />
-    <Compile Include="Packs/GZip.cs" />
-    <Compile Include="Packs/GZipValidation.cs" />
-    <Compile Include="Packs/Pack.cs" />
-    <Compile Include="Packs/PackValidation.cs" />
-    <Compile Include="Packs/ScriptPack.cs" />
-    <Compile Include="Packs/ScriptPackValidation.cs" />
+    <Compile Include="Packs\CdIndexEntry.cs" />
+    <Compile Include="Packs\CdData.cs" />
+    <Compile Include="Packs\CdIndex.cs" />
+    <Compile Include="Packs\CdIndexValidation.cs" />
+    <Compile Include="Packs\CdDataValidation.cs" />
+    <Compile Include="Packs\GZip.cs" />
+    <Compile Include="Packs\GZipValidation.cs" />
+    <Compile Include="Packs\Pack.cs" />
+    <Compile Include="Packs\PackValidation.cs" />
+    <Compile Include="RegexSimple.cs" />
+    <Compile Include="RegexSimpleMode.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
