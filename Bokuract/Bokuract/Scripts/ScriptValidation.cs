@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using Libgame;
 using Libgame.IO;
 using Mono.Addins;
+using System.IO;
 
 namespace Bokuract.Scripts
 {
@@ -50,11 +51,10 @@ namespace Bokuract.Scripts
 
         protected override ValidationResult TestByRegexp(string filepath, string filename)
         {
-            if (filepath.Contains("/cdimg0.img/map/gz/") && filename.StartsWith("M_") &&
-               filename.EndsWith(".bin"))
-                return ValidationResult.Sure;
+            string dirname = Path.GetDirectoryName(filepath);
+            return dirname.EndsWith("/cdimg0.img/map/gz") ?
+                ValidationResult.Sure : ValidationResult.No;
 
-                return ValidationResult.No;
         }
 
         protected override ValidationResult TestByTags(IDictionary<string, object> tags)

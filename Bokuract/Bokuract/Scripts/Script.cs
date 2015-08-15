@@ -19,20 +19,26 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Linq;
 using Mono.Addins;
 using Libgame;
 using Libgame.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+
+
 using System.Xml.Linq;
+using System.IO;
+using System.Collections.ObjectModel;
 
 namespace Bokuract.Scripts
 {
     [Extension]
     public class Script : XmlExportable
     {
-        private GameFile scriptFile;
-        private Dialog[] dialogs;
+        private GameFile mapFile;
+        private List<ScriptMap> scripts;
 
         public override string FormatName {
             get { return "Boku.Script"; }
@@ -40,22 +46,47 @@ namespace Bokuract.Scripts
 
         public override void Read(DataStream strIn)
         {
-            // First uncompress the blocks
-            scriptFile = new GameFile("script", strIn);
-            scriptFile.SetFormat<Bokuract.Packs.Pack>(new object[] { false });
-            scriptFile.Format.Read();
+            // First uncompress the script files from the map file
+            mapFile = new GameFile("Map_" + this.File.Name, strIn);
+            mapFile.SetFormat<Bokuract.Packs.Pack>(new object[] { true });
+            mapFile.Format.Read();
 
-            var dialogsFile = scriptFile.Files[1] as GameFile;
-
-            // Parse each block
-            DataReader reader = new DataReader(dialogsFile.Stream);
-            uint numBlocks = reader.ReadUInt32();
-            dialogs = new Dialog[numBlocks];
-            for (int i = 0; i < numBlocks; i++)
-                dialogs[i] = ParseBlock(dialogsFile.Stream, i);
+            // For each script, uncompress with GZip, divide in blocks and parse
+            scripts = new List<ScriptMap>();
+            foreach (GameFile scriptFile in mapFile.Files.Cast<GameFile>())
+                scripts.Add(ReadScript(scriptFile));
         }
 
-        private static Dialog ParseBlock(DataStream strIn, int num)
+        private static ScriptMap ReadScript(GameFile script)
+        {
+            string scriptName = Path.GetFileNameWithoutExtension(script.Name);
+
+            // Unzip
+            script.SetFormat<Bokuract.Packs.GZip>();
+            script.Stream.Seek(0, SeekMode.Origin);
+            script.Format.Read();
+            var unscript = script.Files[0] as GameFile;
+
+            // and uncompress the blocks
+            unscript.SetFormat<Bokuract.Packs.Pack>(new object[] { false });
+            unscript.Stream.Seek(0, SeekMode.Origin);
+            unscript.Format.Read();
+            var dialogsFile = unscript.Files[1] as GameFile;
+
+            // Parse each block
+            dialogsFile.Stream.Seek(0, SeekMode.Origin);
+            DataReader reader = new DataReader(dialogsFile.Stream);
+            uint numBlocks = reader.ReadUInt32();
+
+            ScriptMap scriptMap = new ScriptMap(scriptName);
+            scriptMap.Dialogs = new Dialog[numBlocks];
+            for (int i = 0; i < numBlocks; i++)
+                scriptMap.Dialogs[i] = ParseScript(dialogsFile.Stream, i);
+
+            return scriptMap;
+        }
+
+        private static Dialog ParseScript(DataStream strIn, int num)
         {
             DataReader reader = new DataReader(strIn);
 
@@ -106,31 +137,50 @@ namespace Bokuract.Scripts
 
         protected override void Export(XElement root)
         {
-            foreach (Dialog dialog in dialogs) {
-                XElement xdialog = new XElement("Dialog");
-                root.Add(xdialog);
+            foreach (ScriptMap script in scripts) {
+                XElement xscript = new XElement("Script");
+                xscript.SetAttributeValue("Name", script.Name);
+                root.Add(xscript);
 
-                xdialog.SetAttributeValue("ID", dialog.Id);
-                foreach (string id in dialog.Text.Keys)
-                    xdialog.Add(
-                        new XElement("Text", dialog.Text[id].ToXmlString(2, '[', ']')));
+                foreach (Dialog dialog in script.Dialogs) {
+                    XElement xdialog = new XElement("Dialog");
+                    xdialog.SetAttributeValue("DialogID", dialog.Id);
+                    xscript.Add(xdialog);
+
+                    foreach (string txt in dialog.Text) {
+                        XElement xtext = new XElement("Text");
+                        xtext.Value = txt.ToXmlString(4, '[', ']');
+                        xdialog.Add(xtext);
+                    }
+                }
             }
         }
 
-
         protected override void Dispose(bool freeManagedResourcesAlso)
         {
-            if (freeManagedResourcesAlso)
-                scriptFile.Stream.Dispose();
+        }
+
+        private struct ScriptMap
+        {
+            public ScriptMap(string name) : this()
+            {
+                Name = name;
+            }
+
+            public string Name { get; private set; }
+
+            public Dialog[] Dialogs { get; set; }
         }
 
         private struct Dialog
         {
-            private Dictionary<string, string> text;
+            private List<string> keys;
+            private List<string> text;
 
             public Dialog(ushort id) : this()
             {
-                text = new Dictionary<string, string>();
+                text = new List<string>();
+                keys = new List<string>();
                 Id   = id;
             }
 
@@ -139,13 +189,14 @@ namespace Bokuract.Scripts
                 private set;
             }
 
-            public ReadOnlyDictionary<string, string> Text {
-                get { return new ReadOnlyDictionary<string, string>(text); }
+            public ReadOnlyCollection<string> Text {
+                get { return new ReadOnlyCollection<string>(text); }
             }
 
             public void AddUnparsedText(string key, ushort[] data)
             {
-                text[key] = ParseText(data);
+                text.Add(ParseText(data));
+                keys.Add(key);
             }
 
             public string ParseText(ushort[] data)
@@ -160,12 +211,11 @@ namespace Bokuract.Scripts
                     else if (data[i] == 0x8000)
                         break;
                     else if (!Table.IsInRange(data[i]))
-                        stringer.AppendFormat("{{{0:X2}}}", data[i]);
+                        stringer.AppendFormat("{{{0}}}", data[i].ToString("X2"));
                     else
                         stringer.Append(Table.GetChar(data[i]));
                 }
 
-                stringer.Replace("\0", "");
                 return stringer.ToString();
             }
         }

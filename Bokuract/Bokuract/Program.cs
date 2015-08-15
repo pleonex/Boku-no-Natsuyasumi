@@ -91,10 +91,11 @@ namespace Bokuract
                     ExtractFolder(folderDir, subfile);
                 } else if (subfile.Length > 0) {
                     string filepath = Path.Combine(folderDir, subfile.Name);
-                    subfile.Stream.WriteTo(filepath);
 
                     if (subfile.Format is Bokuract.Scripts.Script)
                         subfile.Format.Export(filepath + ".xml");
+                    else
+                        subfile.Stream.WriteTo(filepath);
                 }
             }
 
