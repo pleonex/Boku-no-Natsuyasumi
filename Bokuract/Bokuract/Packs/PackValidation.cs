@@ -52,7 +52,7 @@ namespace Bokuract.Packs
 
         private static readonly RegexSimple[,] SupportedFilesNoSubName = {
         //    Directory path                       File name         File extension
-            { Re("*/cdimg0.img/map/gz/*"),         Re("M_*"),        Re(".bin")   },
+        //    { Re("*/cdimg0.img/map/gz/*"),         Re("M_*"),        Re(".bin")   },
             { null,                                Re("font"),       Re(".bin")   },
             { Re("*/cdimg0.img/map/models"),       Re("animlist"),   Re(".bin")   },
             { Re("*/cdimg0.img/map/models/title"), Re("title"),      Re(".bin")   },
