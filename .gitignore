@@ -1,6 +1,11 @@
+# Project files
 Bokuract/packages
 Bokuract/Bokuract.userprefs
 Bokuract/Bokuract/bin/
 Bokuract/Bokuract/obj/
-Bokuract/Bokuract.Tests/bin/
-Bokuract/Bokuract.Tests/obj/
+
+# Extracted data
+data/
+
+# Addin cache folder
+.addins
