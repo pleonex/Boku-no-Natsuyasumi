@@ -45,6 +45,8 @@ namespace Bokuract.Packs
 
                 uint offset = reader.ReadUInt32();
                 uint size   = reader.ReadUInt32();
+                if (offset == 0 || size == 0)
+                    continue;
 
                 string filename;
                 if (withNames) {

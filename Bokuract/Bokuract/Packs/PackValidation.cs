@@ -31,19 +31,33 @@ namespace Bokuract.Packs
     public class PackValidation : FormatValidation
     {
         private static readonly RegexSimple[,] SupportedFilesWithSubName = {
-            { BuildRe("*/cdimg0.img/map/gz"),   null,                 null },
-            { null,                             BuildRe("startup"),   BuildRe(".bin") },
-            { null,                             BuildRe("full_pack"), BuildRe(".bin") },
-            { null,                             BuildRe("all_tex"),   BuildRe(".bin") },
-            { null,                             BuildRe("jumbo"),     BuildRe(".bin") },
-            { null,                             null,                 BuildRe(".mrg") },
-            { null,                             BuildRe("saveload"),  BuildRe(".bin") },
-            { null,                             BuildRe("day"),       BuildRe(".bin") },
+        //    Directory path                       File name         File extension
+            { Re("*/cdimg0.img/map/gz"),           null,             null         },
+            { null,                                Re("startup"),    Re(".bin")   },
+            { null,                                Re("full_pack"),  Re(".bin")   },
+            { null,                                Re("all_tex"),    Re(".bin")   },
+            { null,                                Re("jumbo"),      Re(".bin")   },
+            { null,                                null,             Re(".mrg")   },
+            { null,                                Re("saveload"),   Re(".bin")   },
+            { null,                                Re("day"),        Re(".bin")   },
+            { null,                                null,             Re(".pack")  },
+            { null,                                null,             Re(".pack_") },
+            { null,                                Re("model_pack"), Re(".bin")   },
+            { Re("*/cdimg0.img/map/models/day*"),  Re("day*"),       Re(".bin")   },
+            { null,                                null,             Re(".mpk")   },
+            { Re("*/cdimg0.img/map/models/se"),    Re("smap"),       Re(".bin")   },
+            { Re("*/map/models/test.pack"),        Re("test"),       Re(".mdl")   },
+            { Re("*/map/models/system"),           Re("saveload_*"), Re(".bin")   },
         };
 
         private static readonly RegexSimple[,] SupportedFilesNoSubName = {
-            { BuildRe("*/cdimg0.img/map/gz/*"), BuildRe("M_*"),       BuildRe(".bin") },
-            { null,                             BuildRe("font"),      BuildRe(".bin") }
+        //    Directory path                       File name         File extension
+            { Re("*/cdimg0.img/map/gz/*"),         Re("M_*"),        Re(".bin")   },
+            { null,                                Re("font"),       Re(".bin")   },
+            { Re("*/cdimg0.img/map/models"),       Re("animlist"),   Re(".bin")   },
+            { Re("*/cdimg0.img/map/models/title"), Re("title"),      Re(".bin")   },
+            { Re("*/cdimg0.img/map/models/title"), Re("memory"),     Re(".bin")   },
+            { Re("*/models/title/config.bin.gzx"), Re("config"),     Re(".bin")   },
         };
 
         private static readonly Dictionary<string, bool> CachedFiles = 
@@ -119,7 +133,7 @@ namespace Bokuract.Packs
                 ValidationResult.CouldBe : ValidationResult.No;
         }
 
-        private static RegexSimple BuildRe(string regex)
+        private static RegexSimple Re(string regex)
         {
             return new RegexSimple(regex);   
         }
