@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021 Benito Palacios Sánchez
+// Copyright (c) 2021 Benito Palacios Sánchez
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -17,22 +17,36 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace Bokuract.Packs
+namespace Bokuract.Scripts
 {
-    public class CdIndexEntry
+    using System.Xml.Linq;
+    using Yarhl.FileFormat;
+    using Yarhl.IO;
+    using Yarhl.Media.Text;
+
+    public class Script2Po : IConverter<Script, Po>
     {
-        public static int EntrySize => 0x10;
+        public Po Convert(Script source)
+        {
+            var po = new Po(new PoHeader("Boku1", "TraduSquare", "en"));
 
-        public bool IsFolder { get; set; }
+            foreach (var script in source.Scripts) {
+                foreach (Dialog dialog in script.Dialogs) {
+                    for (int i = 0; i < dialog.Text.Count; i++) {
+                        if (dialog.Text[i].Length == 0) {
+                            continue;
+                        }
 
-        public bool IsLastFile { get; set; }
+                        var entry = new PoEntry {
+                            Context = $"{script.Name}:{dialog.Id}:{i}",
+                            Original = dialog.Text[i],
+                        };
+                        po.Add(entry);
+                    }
+                }
+            }
 
-        public int SubEntries { get; set; }
-
-        public string Name { get; set; }
-
-        public long Offset { get; set; }
-
-        public long Size { get; set; }
+            return po;
+        }
     }
 }

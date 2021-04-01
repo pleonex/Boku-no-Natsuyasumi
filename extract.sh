@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ -d "data/root" ] ; then
-    rm -rf data/root
+if [ -d "GameData/root" ] ; then
+    rm -rf GameData/root
 fi
 
-mono Bokuract/Bokuract/bin/Debug/Bokuract.exe data/
+dotnet run -p Bokuract/Bokuract/Bokuract.csproj -- $PWD/GameData

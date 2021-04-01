@@ -1,11 +1,7 @@
 # Project files
-Bokuract/packages
-Bokuract/Bokuract.userprefs
-Bokuract/Bokuract/bin/
-Bokuract/Bokuract/obj/
+*.userprefs
+obj/
+bin/
 
 # Extracted data
-data/
-
-# Addin cache folder
-.addins
+GameData/

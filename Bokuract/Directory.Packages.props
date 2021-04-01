@@ -1,0 +1,14 @@
+<Project>
+    <!-- Centralize dependency management -->
+    <ItemGroup>
+        <PackageVersion Include="Yarhl" Version="3.1.1-preview.23" />
+        <PackageVersion Include="Yarhl.Media" Version="3.1.1-preview.23" />
+        <PackageVersion Include="DotNetZip" Version="1.15.0" />
+
+        <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+
+        <PackageVersion Include="StyleCop.Analyzers" Version="1.1.118" />
+        <PackageVersion Include="SonarAnalyzer.CSharp" Version="8.20.0.28934" />
+        <PackageVersion Include="Roslynator.Analyzers" Version="3.1.0" />
+    </ItemGroup>
+</Project>

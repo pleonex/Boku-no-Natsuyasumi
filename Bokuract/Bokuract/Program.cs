@@ -1,125 +1,97 @@
-﻿//
-//  Program.cs
+﻿// Copyright (c) 2021 Benito Palacios Sánchez
 //
-//  Author:
-//       Benito Palacios Sánchez <benito356@gmail.com>
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
-//  Copyright (c) 2014 Benito Palacios Sánchez
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
 //
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using System;
-using Libgame;
-using System.IO;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Xml.Linq;
-
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 namespace Bokuract
 {
-    class MainClass
+    using System;
+    using System.Diagnostics;
+    using System.IO;
+    using Bokuract.Packs;
+    using Bokuract.Scripts;
+    using Yarhl.FileSystem;
+    using Yarhl.IO;
+    using Yarhl.Media.Text;
+
+    public static class Program
     {
         public static void Main(string[] args)
         {
             // First args is the path input & output folder
-            if (args.Length == 0)
+            if (args.Length == 0) {
                 return;
+            }
 
             Stopwatch watch = Stopwatch.StartNew();
-
             string folder = args[0];
+            Node root = NodeFactory.FromDirectory(folder, "*", "root");
 
-            // Create system folder
-            GameFolder root = GameFolderFactory.FromPath(folder, "root");
-            root.AssignTagsRecursive(
-                new Dictionary<string, object> { {"_Device_", "PSP"} });
+            // Unpack root files
+            Console.WriteLine("Reading root file...");
+            var rootIdx = root.Children["cdimg.idx"]
+                .TransformWith<Binary2CdIndex>()
+                .GetFormatAs<CdIndex>();
+            root.Children["cdimg0.img"]
+                .TransformWith<BinaryCdData2Container, CdIndex>(rootIdx);
 
-            // Initialize file manager
-            InitializeConfiguration();
-            FileManager.Initialize(root, new FileInfoCollection());
-            FileManager manager = FileManager.GetInstance();
-
-            // Gets file and read it
-            GameFile file = manager.RescueFile("/root/cdimg0.img");
-            file.Format.Read();
-
-            // Extract files
-            Console.WriteLine("Reading files...");
-            ReadAll(root);
-
-            Console.WriteLine("Writing files...");
-            ExtractFolder(folder, root);
+            Console.WriteLine("Exporting files...");
+            Export(folder, root);
 
             watch.Stop();
             Console.WriteLine("Done! It took: {0}", watch.Elapsed);
         }
 
-        private static void ReadAll(FileContainer container)
+        private static void Export(string output, Node container)
         {
-            foreach (GameFile subfile in container.Files) {
-                if (subfile.Format == null)
-                    FileManager.AssignBestFormat(subfile);
+            foreach (Node node in Navigator.IterateNodes(container)) {
+                if (node.IsContainer) {
+                    continue;
+                }
 
-                if (subfile.Format != null)
-                    subfile.Format.Read();
+                if (node.Parent.Path.EndsWith("/cdimg0.img/map/gz")) {
+                    node.TransformWith<BinaryPack2Container, bool>(true);
+                    var script = new Script();
+                    foreach (var child in node.Children) {
+                        var map = child.TransformWith<GZipDecompression, bool>(false)
+                            .TransformWith<BinaryPack2Container, bool>(false)
+                            .Children[1]
+                            .TransformWith<Binary2ScriptMap>()
+                            .GetFormatAs<ScriptMap>();
+                        map.Name = child.Name;
+                        script.Scripts.Add(map);
+                    }
 
-                if (subfile.Files.Count > 0 || subfile.Folders.Count > 0)
-                    ReadAll(subfile);
-            }
-
-            foreach (GameFolder subfolder in container.Folders)
-                ReadAll(subfolder);
-        }
-
-        private static void ExtractFolder(string output, FileContainer folder)
-        {
-            string folderDir = Path.Combine(output, folder.Name);
-            Directory.CreateDirectory(folderDir);
-
-            foreach (GameFile subfile in folder.Files) {
-                if (subfile.Files.Count > 0 || subfile.Folders.Count > 0) {
-                    ExtractFolder(folderDir, subfile);
-                } else if (subfile.Length > 0) {
-                    string filepath = Path.Combine(folderDir, subfile.Name);
-
-                    if (subfile.Format is Bokuract.Scripts.Script)
-                        subfile.Format.Export(filepath + ".xml");
-                    else
-                        subfile.Stream.WriteTo(filepath);
+                    node.ChangeFormat(script);
+                    node.TransformWith<Script2Po>()
+                        .TransformWith<Po2Binary>()
+                        .Stream.WriteTo(Path.Combine(output, node.Path[1..] + ".po"));
+                } else if (node.Path.Contains("/cdimg0.img/map/gz")) {
+                    // Ignore other files of the script container.
+                } else if (node.Name.EndsWith(".gz")) {
+                    node.TransformWith<GZipDecompression, bool>(false);
+                } else if (node.Name.EndsWith(".gzx")) {
+                    node.TransformWith<GZipDecompression, bool>(true);
+                } else if (PackValidation.IsPackFile(node.Path, out bool hasName)) {
+                    node.TransformWith<BinaryPack2Container, bool>(hasName);
+                } else if (node.Format is IBinary) {
+                    node.Stream.WriteTo(Path.Combine(output, node.Path[1..]));
                 }
             }
-
-            foreach (GameFolder subfolder in folder.Folders)
-                ExtractFolder(folderDir, subfolder);
-        }
-
-        private static void InitializeConfiguration()
-        {
-            // This is totally unnecessary in this case. 
-            // I must change it in the libgame project.
-            XElement root = new XElement("GameChanges");
-            root.Add(new XElement("RelativePaths"));
-            root.Add(new XElement("CharTables"));
-
-            XElement specialChars = new XElement("SpecialChars");
-            specialChars.Add(new XElement("Ellipsis"));
-            specialChars.Add(new XElement("QuoteOpen", "\""));
-            specialChars.Add(new XElement("QuoteClose", "\""));
-            specialChars.Add(new XElement("FuriganaOpen", "["));
-            specialChars.Add(new XElement("FuriganaClose", "]"));
-            root.Add(specialChars);
-
-            Configuration.Initialize(new XDocument(root));
         }
     }
 }

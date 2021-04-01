@@ -19,20 +19,38 @@
 // SOFTWARE.
 namespace Bokuract.Packs
 {
-    public class CdIndexEntry
+    using System;
+    using Ionic.Zlib;
+    using Yarhl.FileFormat;
+    using Yarhl.IO;
+
+    public class GZipDecompression : IInitializer<bool>, IConverter<BinaryFormat, BinaryFormat>
     {
-        public static int EntrySize => 0x10;
+        private bool hasDecodedSize;
 
-        public bool IsFolder { get; set; }
+        public void Initialize(bool parameters)
+        {
+            hasDecodedSize = parameters;
+        }
 
-        public bool IsLastFile { get; set; }
+        public BinaryFormat Convert(BinaryFormat source)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
 
-        public int SubEntries { get; set; }
+            source.Stream.Position = hasDecodedSize ? 4 : 0;
 
-        public string Name { get; set; }
+            var decompressed = new BinaryFormat();
+            using var gzip = new GZipStream(source.Stream, CompressionMode.Decompress, true);
 
-        public long Offset { get; set; }
+            int count = 0;
+            byte[] buffer = new byte[60 * 1024];
+            do {
+                count = gzip.Read(buffer, 0, buffer.Length);
+                decompressed.Stream.Write(buffer, 0, count);
+            } while (count > 0);
 
-        public long Size { get; set; }
+            return decompressed;
+        }
     }
 }
